@@ -26,7 +26,7 @@ exports.register = [
             { id: newUser.id, username: newUser.username, role: newUser.role },
             process.env.JWT_SECRET_KEY || "jwt_secret",
             {
-                expiresIn: "1h",
+                expiresIn: "2h",
             }
         );
         return res.status(201).json({ token });
@@ -46,7 +46,7 @@ exports.login = asyncHandler(async (req, res, next) => {
             { id: user.id, username: user.username, role: user.role },
             process.env.JWT_SECRET_KEY || "jwt_secret",
             {
-                expiresIn: "1h",
+                expiresIn: "2h",
             }
         );
         return res.status(200).json({ token });

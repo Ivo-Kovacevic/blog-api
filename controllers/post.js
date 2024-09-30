@@ -26,6 +26,49 @@ exports.postGet = asyncHandler(async (req, res) => {
     return res.status(200).json({ post });
 });
 
-exports.postPost = asyncHandler(async (req, res) => {});
-exports.postPut = asyncHandler(async (req, res) => {});
-exports.postDelete = asyncHandler(async (req, res) => {});
+exports.createPostPost = [
+    passport.authenticate("jwt", { session: false }),
+    roleCheck("ADMIN"),
+    asyncHandler(async (req, res) => {
+        const authorId = req.user.id;
+        const title = req.body.title;
+        const content = req.body.content;
+        const validStatuses = ["PUBLISHED", "UNPUBLISHED"];
+        const status = validStatuses.includes(req.body.status) ? req.body.status : "UNPUBLISHED";
+        const newPost = await query.newPost(authorId, title, content, status);
+        if (!newPost) {
+            return res.status(404).json({ message: "Error: Post not found" });
+        }
+        return res.status(201).json({ post: newPost });
+    }),
+];
+
+exports.updatePostPut = [
+    passport.authenticate("jwt", { session: false }),
+    roleCheck("ADMIN"),
+    asyncHandler(async (req, res) => {
+        const postId = parseInt(req.params.postId);
+        const title = req.body.title;
+        const content = req.body.content;
+        const validStatuses = ["PUBLISHED", "UNPUBLISHED"];
+        const status = validStatuses.includes(req.body.status) ? req.body.status : "UNPUBLISHED";
+        const post = await query.updatePost(postId, title, content, status);
+        if (!post) {
+            return res.status(404).json({ message: "Error: Post not found" });
+        }
+        return res.status(200).json({ post });
+    }),
+];
+
+exports.deletePostDelete = [
+    passport.authenticate("jwt", { session: false }),
+    roleCheck("ADMIN"),
+    asyncHandler(async (req, res) => {
+        const postId = parseInt(req.params.postId);
+        const post = await query.deletePost(postId);
+        if (!post) {
+            return res.status(404).json({ message: "Error: Post not found" });
+        }
+        return res.status(204).send();
+    }),
+];

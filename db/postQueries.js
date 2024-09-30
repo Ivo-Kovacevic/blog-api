@@ -31,3 +31,58 @@ exports.getPostById = async (id) => {
         throw new Error("Could not retrieve the post.");
     }
 };
+
+exports.newPost = async (authorId, title, content, status) => {
+    try {
+        return await prisma.post.create({
+            data: {
+                authorId,
+                title,
+                content,
+                status,
+            },
+        });
+    } catch (error) {
+        console.error("Error creating new post: ", error);
+        throw new Error("Could not create the post.");
+    }
+};
+
+exports.updatePost = async (id, title, content, status) => {
+    try {
+        const postExists = await exports.getPostById(id);
+        if (!postExists) {
+            return null;
+        }
+        return await prisma.post.update({
+            where: {
+                id,
+            },
+            data: {
+                title,
+                content,
+                status,
+            },
+        });
+    } catch (error) {
+        console.error("Error updating post: ", error);
+        throw new Error("Could not update the post.");
+    }
+};
+
+exports.deletePost = async (id) => {
+    try {
+        const postExists = await exports.getPostById(id);
+        if (!postExists) {
+            return null;
+        }
+        return await prisma.post.delete({
+            where: {
+                id: id,
+            },
+        });
+    } catch (error) {
+        console.error("Error deleting post: ", error);
+        throw new Error("Could not delete the post.");
+    }
+};
