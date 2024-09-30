@@ -37,7 +37,7 @@ exports.createPostPost = [
         const status = validStatuses.includes(req.body.status) ? req.body.status : "UNPUBLISHED";
         const newPost = await query.newPost(authorId, title, content, status);
         if (!newPost) {
-            return res.status(404).json({ message: "Error: Post not found" });
+            return res.status(404).json({ message: "Error: Couldn't create post" });
         }
         return res.status(201).json({ post: newPost });
     }),

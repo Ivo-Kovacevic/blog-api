@@ -1,24 +1,11 @@
 const { Router } = require("express");
 const router = Router();
+const controller = require("../controllers/comment");
 
-router.get("/", (req, res) => {
-    return res.sendStatus(200);
-});
-
-router.get("/:commentId", (req, res) => {
-    return res.sendStatus(200);
-});
-
-router.post("/", (req, res) => {
-    return res.sendStatus(200);
-});
-
-router.put("/:commentId", (req, res) => {
-    return res.sendStatus(200);
-});
-
-router.delete("/:commentId", (req, res) => {
-    return res.sendStatus(200);
-});
+// router.get("/", controller.allCommentsGet);
+// router.get("/:commentId", controller.commentGet);
+router.post("/", controller.createCommentPost);
+router.put("/:commentId", controller.updateCommentPut);
+router.delete("/:commentId", controller.deleteCommentDelete);
 
 module.exports = router;
