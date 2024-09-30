@@ -1,24 +1,11 @@
 const { Router } = require("express");
 const router = Router();
+const controller = require("../controllers/post");
 
-router.get("/", (req, res) => {
-    return res.sendStatus(200);
-});
-
-router.get("/:postId", (req, res) => {
-    return res.sendStatus(200);
-});
-
-router.post("/", (req, res) => {
-    return res.sendStatus(200);
-});
-
-router.put("/:postId", (req, res) => {
-    return res.sendStatus(200);
-});
-
-router.delete("/:postId", (req, res) => {
-    return res.sendStatus(200);
-});
+router.get("/", controller.allPostsGet);
+router.get("/:postId", controller.postGet);
+router.post("/", controller.postPost);
+router.put("/:postId", controller.postPut);
+router.delete("/:postId", controller.postDelete);
 
 module.exports = router;

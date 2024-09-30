@@ -15,8 +15,6 @@ exports.getUserById = async (id) => {
     } catch (error) {
         console.error(error);
         throw error;
-    } finally {
-        await prisma.$disconnect();
     }
 };
 
@@ -30,8 +28,6 @@ exports.getUserByUsername = async (username) => {
     } catch (error) {
         console.error(error);
         throw error;
-    } finally {
-        await prisma.$disconnect();
     }
 };
 
@@ -50,8 +46,6 @@ exports.registerUser = async (username, password) => {
     } catch (error) {
         console.error("Error while registering user: ", error);
         throw error;
-    } finally {
-        await prisma.$disconnect();
     }
 };
 
@@ -68,8 +62,6 @@ exports.userToAdmin = async (id) => {
     } catch (error) {
         console.error(error);
         throw error;
-    } finally {
-        await prisma.$disconnect();
     }
 };
 
@@ -79,8 +71,6 @@ exports.getAllUsers = async () => {
     } catch (error) {
         console.error(error);
         throw error;
-    } finally {
-        await prisma.$disconnect();
     }
 };
 
@@ -98,8 +88,6 @@ exports.deleteUser = async (id) => {
     } catch (error) {
         console.error(error);
         throw error;
-    } finally {
-        await prisma.$disconnect();
     }
 };
 
@@ -120,7 +108,5 @@ exports.updateUser = async (id, username) => {
     } catch (error) {
         console.error(error);
         throw error;
-    } finally {
-        await prisma.$disconnect();
     }
 };
