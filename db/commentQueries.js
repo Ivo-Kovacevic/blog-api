@@ -1,6 +1,16 @@
 const { PrismaClient, Role, Status } = require("@prisma/client");
 const prisma = new PrismaClient();
 
+
+exports.getAllComments = async () => {
+    try {
+        return await prisma.comment.findMany();
+    } catch (error) {
+        console.error("Error retrieving comment: ", error);
+        throw new Error("Could not retrieve the comments.");
+    }
+};
+
 exports.getCommentById = async (id) => {
     try {
         return await prisma.comment.findUnique({

@@ -20,7 +20,7 @@ exports.getUserById = async (id) => {
 
 exports.getUserByUsername = async (username) => {
     try {
-        return await prisma.user.findUnique({
+        return await prisma.user.findFirst({
             where: {
                 username: username,
             },
@@ -91,7 +91,7 @@ exports.deleteUser = async (id) => {
     }
 };
 
-exports.updateUser = async (id, username) => {
+exports.updateUser = async (id, username, password) => {
     try {
         const usernameTaken = await exports.getUserByUsername(username);
         if (usernameTaken) {
@@ -102,7 +102,8 @@ exports.updateUser = async (id, username) => {
                 id: id,
             },
             data: {
-                username: username,
+                username,
+                password,
             },
         });
     } catch (error) {

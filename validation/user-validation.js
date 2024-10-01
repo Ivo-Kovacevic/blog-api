@@ -1,22 +1,19 @@
 const { check, body } = require("express-validator");
 
-const alphaErr = "must only contain letters and numbers.";
-const usernameLengthErr = "must be between 4 and 20 characters.";
-const passwordLengthErr = "must be at least 4 characters long.";
-const passwordMatchErr = "Passwords do not match";
-
-const validateNewUser = [
+const validateUser = [
     check("username")
         .trim()
+        .isLength({ min: 1 })
+        .withMessage(`Username must not be empty`)
         .matches(/^[A-Za-z0-9]+$/)
-        .withMessage(`Username ${alphaErr}`)
+        .withMessage(`Username must only contain letters and numbers.`)
         .isLength({ min: 4, max: 20 })
-        .withMessage(`Username ${usernameLengthErr}`),
+        .withMessage(`Username must be between 4 and 20 characters.`),
 
     check("password")
         .trim()
         .isLength({ min: 4 })
-        .withMessage(`Password ${passwordLengthErr}`)
+        .withMessage(`Password must be at least 4 characters long.`),
 ];
 
-module.exports = { validateNewUser };
+module.exports = { validateUser };
