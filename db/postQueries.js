@@ -33,7 +33,17 @@ exports.getPostById = async (id) => {
                         username: true,
                     },
                 },
-                comments: true,
+                comments: {
+                    select: {
+                        text: true,
+                        createdAt: true,
+                        author: {
+                            select: {
+                                username: true,
+                            }
+                        }
+                    }
+                },
             },
         });
     } catch (error) {

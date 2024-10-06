@@ -17,10 +17,10 @@ app.post("/login", auth.login);
 
 app.use("/users", routes.user);
 app.use("/posts", routes.post);
-app.use("/comments", routes.comment);
+app.use("/posts/:postId/comments", routes.comment);
 
 app.use("*", (req, res) => {
-  res.status(404).json({ message: "Error: Invalid endpoint" });
+    res.status(404).json({ message: "Error: Invalid endpoint" });
 });
 
 app.listen(PORT, () => console.log(`App is live at port ${PORT}`));

@@ -31,8 +31,10 @@ exports.createCommentPost = [
     passport.authenticate("jwt", { session: false }),
     asyncHandler(async (req, res) => {
         const authorId = req.user.id;
-        const postId = parseInt(req.body.postId);
+        const postId = parseInt(req.params.postId);
         const text = req.body.text;
+        console.log(req.params);
+
         const newComment = await query.newComment(authorId, postId, text);
         if (!newComment) {
             return res.status(404).json({ message: "Error: Couldn't create message" });
