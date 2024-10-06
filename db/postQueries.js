@@ -7,6 +7,11 @@ exports.getAllPosts = async (onlyPublished) => {
         return await prisma.post.findMany({
             where: whereCondition,
             include: {
+                author: {
+                    select: {
+                        username: true,
+                    },
+                },
                 comments: true,
             },
         });
@@ -23,6 +28,11 @@ exports.getPostById = async (id) => {
                 id: id,
             },
             include: {
+                author: {
+                    select: {
+                        username: true,
+                    },
+                },
                 comments: true,
             },
         });
