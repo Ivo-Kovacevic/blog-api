@@ -1,16 +1,14 @@
-const asyncHandler = require("express-async-handler");
-const passport = require("../config/passport.config");
-const query = require("../db/commentQueries");
-const { roleCheck } = require("../middlewares/roleCheck");
-const { validationResult } = require("express-validator");
-const { validateUser } = require("../validation/user-validation");
+import asyncHandler from "express-async-handler";
+import passport from "../config/passport.config.js";
+import query from "../db/commentQueries.js";
+import { roleCheck } from "../middlewares/roleCheck.js";
 
 // ADMIN only
-exports.allCommentsGet = [
+export const allCommentsGet = [
     passport.authenticate("jwt", { session: false }),
     roleCheck("ADMIN"),
     asyncHandler(async (req, res) => {
-        comments = await query.getAllComments();
+        const comments = await query.getAllComments();
         if (!comments || comments.length === 0) {
             return res.status(204).json({ message: "No post was found" });
         }
@@ -18,7 +16,7 @@ exports.allCommentsGet = [
     }),
 ];
 
-exports.commentGet = asyncHandler(async (req, res) => {
+export const commentGet = asyncHandler(async (req, res) => {
     const commentId = parseInt(req.params.commentId);
     const comment = await query.getCommentById(commentId);
     if (!comment) {
@@ -27,7 +25,7 @@ exports.commentGet = asyncHandler(async (req, res) => {
     return res.status(200).json({ comment });
 });
 
-exports.createCommentPost = [
+export const createCommentPost = [
     passport.authenticate("jwt", { session: false }),
     asyncHandler(async (req, res) => {
         const authorId = req.user.id;
@@ -41,7 +39,7 @@ exports.createCommentPost = [
     }),
 ];
 
-exports.updateCommentPut = [
+export const updateCommentPut = [
     passport.authenticate("jwt", { session: false }),
     asyncHandler(async (req, res) => {
         const commentId = parseInt(req.params.commentId);
@@ -59,7 +57,7 @@ exports.updateCommentPut = [
     }),
 ];
 
-exports.deleteCommentDelete = [
+export const deleteCommentDelete = [
     passport.authenticate("jwt", { session: false }),
     asyncHandler(async (req, res) => {
         const commentId = parseInt(req.params.commentId);
@@ -75,3 +73,13 @@ exports.deleteCommentDelete = [
         return res.status(204).send();
     }),
 ];
+
+const controller = {
+    allCommentsGet,
+    commentGet,
+    createCommentPost,
+    updateCommentPut,
+    deleteCommentDelete,
+};
+
+export default controller;

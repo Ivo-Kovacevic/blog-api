@@ -1,8 +1,8 @@
-const passport = require("../config/passport.config");
-const asyncHandler = require("express-async-handler");
-const jwt = require("jsonwebtoken");
+import passport from "../config/passport.config.js";
+import asyncHandler from "express-async-handler";
+import jwt from "jsonwebtoken";
 
-exports.login = asyncHandler(async (req, res, next) => {
+export const auth = asyncHandler(async (req, res, next) => {
   passport.authenticate("local", { session: false }, (err, user, info) => {
     if (err || !user) {
       return res.status(401).json({

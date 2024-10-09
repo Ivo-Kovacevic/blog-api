@@ -1,9 +1,9 @@
-require("dotenv").config();
-const express = require("express");
-const cors = require("cors");
-const routes = require("./routes/index");
-const auth = require("./middlewares/auth");
-const { attachUserMiddleware } = require("./middlewares/attachUser");
+import "dotenv/config";
+import express, { Express, Request, Response } from "express";
+import cors from "cors";
+import routes from "./routes/index.js";
+import { auth } from "./middlewares/auth.js";
+import { attachUserMiddleware } from "./middlewares/attachUser.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -13,8 +13,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(attachUserMiddleware);
 
-app.post("/login", auth.login);
-
+app.post("/login", auth);
 app.use("/users", routes.user);
 app.use("/posts", routes.post);
 app.use("/posts/:postId/comments", routes.comment);

@@ -1,6 +1,6 @@
-const { check, body } = require("express-validator");
+import { check, body } from "express-validator";
 
-const validateUser = [
+export const validateUser = [
     check("username")
         .trim()
         .isLength({ min: 1 })
@@ -15,5 +15,3 @@ const validateUser = [
         .isLength({ min: 4 })
         .withMessage(`Password must be at least 4 characters long.`),
 ];
-
-module.exports = { validateUser };

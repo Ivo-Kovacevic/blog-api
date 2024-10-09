@@ -1,7 +1,7 @@
-const { PrismaClient, Role, Status } = require("@prisma/client");
+import { PrismaClient, Role, Status } from "@prisma/client";
 const prisma = new PrismaClient();
 
-exports.getAllPosts = async (onlyPublished) => {
+export const getAllPosts = async (onlyPublished) => {
     try {
         const whereCondition = onlyPublished ? { status: Status.PUBLISHED } : {};
         return await prisma.post.findMany({
@@ -21,7 +21,7 @@ exports.getAllPosts = async (onlyPublished) => {
     }
 };
 
-exports.getPostById = async (id) => {
+export const getPostById = async (id) => {
     try {
         return await prisma.post.findUnique({
             where: {
@@ -42,11 +42,11 @@ exports.getPostById = async (id) => {
                         author: {
                             select: {
                                 username: true,
-                            }
-                        }
+                            },
+                        },
                     },
                     orderBy: {
-                        createdAt: 'desc',
+                        createdAt: "desc",
                     },
                 },
             },
@@ -57,7 +57,7 @@ exports.getPostById = async (id) => {
     }
 };
 
-exports.newPost = async (authorId, title, content, status) => {
+export const newPost = async (authorId, title, content, status) => {
     try {
         return await prisma.post.create({
             data: {
@@ -73,7 +73,7 @@ exports.newPost = async (authorId, title, content, status) => {
     }
 };
 
-exports.updatePost = async (id, title, content, status) => {
+export const updatePost = async (id, title, content, status) => {
     try {
         const postExists = await exports.getPostById(id);
         if (!postExists) {
@@ -95,7 +95,7 @@ exports.updatePost = async (id, title, content, status) => {
     }
 };
 
-exports.deletePost = async (id) => {
+export const deletePost = async (id) => {
     try {
         const postExists = await exports.getPostById(id);
         if (!postExists) {
@@ -110,4 +110,12 @@ exports.deletePost = async (id) => {
         console.error("Error deleting post: ", error);
         throw new Error("Could not delete the post.");
     }
+};
+
+export default {
+    getAllPosts,
+    getPostById,
+    newPost,
+    updatePost,
+    deletePost,
 };
