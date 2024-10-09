@@ -35,14 +35,19 @@ exports.getPostById = async (id) => {
                 },
                 comments: {
                     select: {
+                        id: true,
                         text: true,
                         createdAt: true,
+                        authorId: true,
                         author: {
                             select: {
                                 username: true,
                             }
                         }
-                    }
+                    },
+                    orderBy: {
+                        createdAt: 'desc',
+                    },
                 },
             },
         });
