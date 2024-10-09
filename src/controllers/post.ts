@@ -2,8 +2,9 @@ import asyncHandler from "express-async-handler";
 import passport from "../config/passport.config.js";
 import query from "../db/postQueries.js";
 import { roleCheck } from "../middlewares/roleCheck.js";
+import { Request, Response, NextFunction } from "express";
 
-export const allPostsGet = asyncHandler(async (req, res) => {
+export const allPostsGet = asyncHandler(async (req: Request, res: Response) => {
     let onlyPublished = true;
 
     // Get all posts if user is ADMIN
@@ -12,25 +13,27 @@ export const allPostsGet = asyncHandler(async (req, res) => {
     }
     const posts = await query.getAllPosts(onlyPublished);
     if (!posts || posts.length === 0) {
-        return res.status(204).json({ message: "No post was found" });
+        res.status(204).json({ message: "No post was found" });
+        return;
     }
-    return res.status(200).json({ posts });
+    res.status(200).json({ posts });
 });
 
-export const postGet = asyncHandler(async (req, res) => {
+export const postGet = asyncHandler(async (req: Request, res: Response) => {
     const postId = parseInt(req.params.postId);
     const post = await query.getPostById(postId);
     if (!post) {
-        return res.status(404).json({ message: "Error: Post not found" });
+        res.status(404).json({ message: "Error: Post not found" });
+        return;
     }
-    return res.status(200).json({ post });
+    res.status(200).json({ post });
 });
 
 // ADMIN only
 export const createPostPost = [
     passport.authenticate("jwt", { session: false }),
     roleCheck("ADMIN"),
-    asyncHandler(async (req, res) => {
+    asyncHandler(async (req: Request, res: Response) => {
         const authorId = req.user.id;
         const title = req.body.title;
         const content = req.body.content;
@@ -38,9 +41,10 @@ export const createPostPost = [
         const status = validStatuses.includes(req.body.status) ? req.body.status : "UNPUBLISHED";
         const newPost = await query.newPost(authorId, title, content, status);
         if (!newPost) {
-            return res.status(404).json({ message: "Error: Couldn't create post" });
+            res.status(404).json({ message: "Error: Couldn't create post" });
+            return;
         }
-        return res.status(201).json({ post: newPost });
+        res.status(201).json({ post: newPost });
     }),
 ];
 
@@ -48,7 +52,7 @@ export const createPostPost = [
 export const updatePostPut = [
     passport.authenticate("jwt", { session: false }),
     roleCheck("ADMIN"),
-    asyncHandler(async (req, res) => {
+    asyncHandler(async (req: Request, res: Response) => {
         const postId = parseInt(req.params.postId);
         const title = req.body.title;
         const content = req.body.content;
@@ -56,9 +60,10 @@ export const updatePostPut = [
         const status = validStatuses.includes(req.body.status) ? req.body.status : "UNPUBLISHED";
         const post = await query.updatePost(postId, title, content, status);
         if (!post) {
-            return res.status(404).json({ message: "Error: Post not found" });
+            res.status(404).json({ message: "Error: Post not found" });
+            return;
         }
-        return res.status(200).json({ post });
+        res.status(200).json({ post });
     }),
 ];
 
@@ -66,13 +71,14 @@ export const updatePostPut = [
 export const deletePostDelete = [
     passport.authenticate("jwt", { session: false }),
     roleCheck("ADMIN"),
-    asyncHandler(async (req, res) => {
+    asyncHandler(async (req: Request, res: Response) => {
         const postId = parseInt(req.params.postId);
         const post = await query.deletePost(postId);
         if (!post) {
-            return res.status(404).json({ message: "Error: Post not found" });
+            res.status(404).json({ message: "Error: Post not found" });
+            return;
         }
-        return res.status(204).send();
+        res.status(204).send();
     }),
 ];
 

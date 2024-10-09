@@ -1,13 +1,16 @@
 import { PrismaClient, Role, Status } from "@prisma/client";
 const prisma = new PrismaClient();
 
-export const getUserById = async (id) => {
+export const getUserById = async (id: number) => {
     try {
         return await prisma.user.findUnique({
             where: {
                 id: id,
             },
-            include: {
+            select: {
+                id: true,
+                username: true,
+                role: true,
                 posts: true,
                 comments: true,
             },
@@ -18,7 +21,7 @@ export const getUserById = async (id) => {
     }
 };
 
-export const getUserByUsername = async (username) => {
+export const getUserByUsername = async (username: string) => {
     try {
         return await prisma.user.findFirst({
             where: {
@@ -31,7 +34,7 @@ export const getUserByUsername = async (username) => {
     }
 };
 
-export const registerUser = async (username, password) => {
+export const registerUser = async (username: string, password: string) => {
     try {
         const existingUser = await exports.getUserByUsername(username);
         if (existingUser) {
@@ -49,7 +52,7 @@ export const registerUser = async (username, password) => {
     }
 };
 
-export const userToAdmin = async (id) => {
+export const userToAdmin = async (id: number) => {
     try {
         return await prisma.user.update({
             where: {
@@ -74,7 +77,7 @@ export const getAllUsers = async () => {
     }
 };
 
-export const deleteUser = async (id) => {
+export const deleteUser = async (id: number) => {
     try {
         const userExists = await exports.getUserById(id);
         if (!userExists) {
@@ -91,7 +94,7 @@ export const deleteUser = async (id) => {
     }
 };
 
-export const updateUser = async (id, username, password) => {
+export const updateUser = async (id: number, username: string, password: string) => {
     try {
         const usernameTaken = await exports.getUserByUsername(username);
         if (usernameTaken) {

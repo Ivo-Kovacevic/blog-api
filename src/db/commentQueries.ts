@@ -10,7 +10,7 @@ export const getAllComments = async () => {
     }
 };
 
-export const getCommentById = async (id) => {
+export const getCommentById = async (id: number) => {
     try {
         return await prisma.comment.findUnique({
             where: {
@@ -23,7 +23,7 @@ export const getCommentById = async (id) => {
     }
 };
 
-export const newComment = async (authorId, postId, text) => {
+export const newComment = async (authorId: number, postId: number, text: string) => {
     try {
         return await prisma.comment.create({
             data: {
@@ -46,7 +46,7 @@ export const newComment = async (authorId, postId, text) => {
     }
 };
 
-export const updateComment = async (id, text) => {
+export const updateComment = async (id: number, text: string) => {
     try {
         const commentExists = await exports.getCommentById(id);
         if (!commentExists) {
@@ -66,7 +66,7 @@ export const updateComment = async (id, text) => {
     }
 };
 
-export const deleteComment = async (id) => {
+export const deleteComment = async (id: number) => {
     try {
         const commentExists = await exports.getCommentById(id);
         if (!commentExists) {

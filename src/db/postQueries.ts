@@ -1,7 +1,7 @@
 import { PrismaClient, Role, Status } from "@prisma/client";
 const prisma = new PrismaClient();
 
-export const getAllPosts = async (onlyPublished) => {
+export const getAllPosts = async (onlyPublished: boolean) => {
     try {
         const whereCondition = onlyPublished ? { status: Status.PUBLISHED } : {};
         return await prisma.post.findMany({
@@ -21,7 +21,7 @@ export const getAllPosts = async (onlyPublished) => {
     }
 };
 
-export const getPostById = async (id) => {
+export const getPostById = async (id: number) => {
     try {
         return await prisma.post.findUnique({
             where: {
@@ -57,7 +57,7 @@ export const getPostById = async (id) => {
     }
 };
 
-export const newPost = async (authorId, title, content, status) => {
+export const newPost = async (authorId: number, title: string, content: string, status: Status) => {
     try {
         return await prisma.post.create({
             data: {
@@ -73,7 +73,7 @@ export const newPost = async (authorId, title, content, status) => {
     }
 };
 
-export const updatePost = async (id, title, content, status) => {
+export const updatePost = async (id: number, title: string, content: string, status: Status) => {
     try {
         const postExists = await exports.getPostById(id);
         if (!postExists) {
@@ -95,7 +95,7 @@ export const updatePost = async (id, title, content, status) => {
     }
 };
 
-export const deletePost = async (id) => {
+export const deletePost = async (id: number) => {
     try {
         const postExists = await exports.getPostById(id);
         if (!postExists) {
