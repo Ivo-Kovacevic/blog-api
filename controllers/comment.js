@@ -6,17 +6,30 @@ const { validationResult } = require("express-validator");
 const { validateUser } = require("../validation/user-validation");
 
 // ADMIN only
-exports.allCommentsGet = [
-    passport.authenticate("jwt", { session: false }),
-    roleCheck("ADMIN"),
-    asyncHandler(async (req, res) => {
-        comments = await query.getAllComments();
-        if (!comments || comments.length === 0) {
-            return res.status(204).json({ message: "No post was found" });
-        }
-        return res.status(200).json({ comments });
-    }),
-];
+exports.allCommentsGet = asyncHandler(async (req, res) => {
+    let postId;
+    let userId;
+
+    if (req.params.postId) {
+        postId = parseInt(req.params.postId);
+    }
+    if (req.params.userId) {
+        userId = parseInt(req.params.userId);
+    }
+
+    const page = parseInt(req.query.page) || 1; // 1, 2
+    const limit = parseInt(req.query.limit) || 5; // 5
+    const skip = (page - 1) * limit; // 0, 5
+
+    const { comments, totalCount } = await query.getAllComments({postId, userId}, limit, skip);
+    
+    if (!comments || comments.length === 0) {
+        return res.status(204).json({ message: "No post was found" });
+    }
+    const hasMore = (skip + comments.length) < totalCount;
+
+    return res.status(200).json({ comments, hasMore });
+});
 
 exports.commentGet = asyncHandler(async (req, res) => {
     const commentId = parseInt(req.params.commentId);

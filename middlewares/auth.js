@@ -18,6 +18,6 @@ exports.login = asyncHandler(async (req, res, next) => {
                 expiresIn: "2h",
             }
         );
-        return res.status(200).json({ token });
+        return res.status(200).json({ userId: user.id, username: user.username, token });
     })(req, res, next);
 });

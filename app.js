@@ -18,6 +18,7 @@ app.post("/login", auth.login);
 app.use("/users", routes.user);
 app.use("/posts", routes.post);
 app.use("/posts/:postId/comments", routes.comment);
+app.use("/users/:userId/comments", routes.comment);
 
 app.use("*", (req, res) => {
     res.status(404).json({ message: "Error: Invalid endpoint" });

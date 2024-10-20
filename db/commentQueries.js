@@ -1,12 +1,36 @@
 const { PrismaClient, Role, Status } = require("@prisma/client");
 const prisma = new PrismaClient();
 
-
-exports.getAllComments = async () => {
+exports.getAllComments = async ({postId, userId}, limit, skip) => {
     try {
-        return await prisma.comment.findMany();
+        const filter = {};
+        if (postId) {
+            filter.postId = postId;
+        }
+        if (userId) {
+            filter.authorId = userId;
+        }
+        const totalCount = await prisma.comment.count({
+            where: filter,
+        });
+        const comments = await prisma.comment.findMany({
+            where: filter,
+            include: {
+                author: {
+                    select: {
+                        username: true,
+                    },
+                },
+            },
+            orderBy: {
+                createdAt: 'desc',
+            },
+            skip: skip,
+            take: limit,
+        });
+        return { comments, totalCount };
     } catch (error) {
-        console.error("Error retrieving comment: ", error);
+        console.error("Error retrieving comments: ", error);
         throw new Error("Could not retrieve the comments.");
     }
 };
@@ -40,6 +64,13 @@ exports.newComment = async (authorId, postId, text) => {
                     },
                 },
             },
+            include: {
+                author: {
+                    select: {
+                        username: true,
+                    }
+                }
+            }
         });
     } catch (error) {
         console.error("Error creating new comment: ", error);
