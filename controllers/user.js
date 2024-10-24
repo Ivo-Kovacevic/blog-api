@@ -24,7 +24,7 @@ exports.userGet = asyncHandler(async (req, res) => {
         return res.status(404).json({ message: "Error: User not found" });
     }
     return res.status(200).json({
-        user: user.username,
+        username: user.username,
         posts: user.posts,
         comments: user.comments,
     });
