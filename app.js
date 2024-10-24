@@ -24,4 +24,6 @@ app.use("*", (req, res) => {
     res.status(404).json({ message: "Error: Invalid endpoint" });
 });
 
-app.listen(PORT, () => console.log(`App is live at port ${PORT}`));
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`App is live at port ${PORT}`);
+});
