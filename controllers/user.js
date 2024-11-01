@@ -52,7 +52,7 @@ exports.createUserPost = [
                 expiresIn: "2h",
             }
         );
-        return res.status(201).json({ token });
+        return res.status(201).json({ userId: newUser.id, username: newUser.username, token });
     }),
 ];
 
