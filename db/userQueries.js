@@ -1,7 +1,7 @@
-const { PrismaClient, Role } = require("@prisma/client");
+import { PrismaClient, Role } from "@prisma/client";
 const prisma = new PrismaClient();
 
-exports.getUserById = async (id) => {
+export const getUserById = async (id) => {
     try {
         return await prisma.user.findUnique({
             where: {
@@ -18,7 +18,7 @@ exports.getUserById = async (id) => {
     }
 };
 
-exports.getUserByUsername = async (username) => {
+export const getUserByUsername = async (username) => {
     try {
         return await prisma.user.findFirst({
             where: {
@@ -31,9 +31,9 @@ exports.getUserByUsername = async (username) => {
     }
 };
 
-exports.registerUser = async (username, password) => {
+export const registerUser = async (username, password) => {
     try {
-        const existingUser = await exports.getUserByUsername(username);
+        const existingUser = await getUserByUsername(username);
         if (existingUser) {
             return "Username is taken";
         }
@@ -49,7 +49,7 @@ exports.registerUser = async (username, password) => {
     }
 };
 
-exports.userToAdmin = async (id) => {
+export const userToAdmin = async (id) => {
     try {
         return await prisma.user.update({
             where: {
@@ -65,7 +65,7 @@ exports.userToAdmin = async (id) => {
     }
 };
 
-exports.getAllUsers = async () => {
+export const getAllUsers = async () => {
     try {
         return await prisma.user.findMany();
     } catch (error) {
@@ -74,9 +74,9 @@ exports.getAllUsers = async () => {
     }
 };
 
-exports.deleteUser = async (id) => {
+export const deleteUser = async (id) => {
     try {
-        const userExists = await exports.getUserById(id);
+        const userExists = await getUserById(id);
         if (!userExists) {
             return null;
         }
@@ -91,9 +91,9 @@ exports.deleteUser = async (id) => {
     }
 };
 
-exports.updateUser = async (id, username, password) => {
+export const updateUser = async (id, username, password) => {
     try {
-        const usernameTaken = await exports.getUserByUsername(username);
+        const usernameTaken = await getUserByUsername(username);
         if (usernameTaken) {
             return null;
         }

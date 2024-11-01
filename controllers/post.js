@@ -1,23 +1,23 @@
-const asyncHandler = require("express-async-handler");
-const passport = require("../config/passport.config");
-const query = require("../db/postQueries");
-const { roleCheck } = require("../middlewares/roleCheck");
+import asyncHandler from "express-async-handler";
+import passport from "../config/passport.config.js";
+import * as query from "../db/postQueries.js";
+import { roleCheck } from "../middlewares/roleCheck.js";
 
-exports.allPostsGet = asyncHandler(async (req, res) => {
+export const allPostsGet = asyncHandler(async (req, res) => {
     let onlyPublished = true;
 
     // Get all posts if user is ADMIN
     if (req.user && req.user.role === "ADMIN") {
         onlyPublished = false;
     }
-    posts = await query.getAllPosts(onlyPublished);
+    const posts = await query.getAllPosts(onlyPublished);
     if (!posts || posts.length === 0) {
         return res.status(204).json({ message: "No post was found" });
     }
     return res.status(200).json({ posts });
 });
 
-exports.postGet = asyncHandler(async (req, res) => {
+export const postGet = asyncHandler(async (req, res) => {
     const postId = parseInt(req.params.postId);
     const post = await query.getPostById(postId);
     if (!post) {
@@ -27,7 +27,7 @@ exports.postGet = asyncHandler(async (req, res) => {
 });
 
 // ADMIN only
-exports.createPostPost = [
+export const createPostPost = [
     passport.authenticate("jwt", { session: false }),
     roleCheck("ADMIN"),
     asyncHandler(async (req, res) => {
@@ -45,7 +45,7 @@ exports.createPostPost = [
 ];
 
 // ADMIN only
-exports.updatePostPut = [
+export const updatePostPut = [
     passport.authenticate("jwt", { session: false }),
     roleCheck("ADMIN"),
     asyncHandler(async (req, res) => {
@@ -63,7 +63,7 @@ exports.updatePostPut = [
 ];
 
 // ADMIN only
-exports.deletePostDelete = [
+export const deletePostDelete = [
     passport.authenticate("jwt", { session: false }),
     roleCheck("ADMIN"),
     asyncHandler(async (req, res) => {

@@ -1,10 +1,10 @@
-require("dotenv").config();
-const passport = require("passport");
-const LocalStrategy = require("passport-local").Strategy;
-const JwtStrategy = require("passport-jwt").Strategy;
-const ExtractJwt = require("passport-jwt").ExtractJwt;
-const bcrypt = require("bcryptjs");
-const query = require("../db/userQueries");
+import dotenv from "dotenv/config";
+import passport from "passport";
+import { Strategy as LocalStrategy } from "passport-local";
+import { Strategy as JwtStrategy, ExtractJwt } from "passport-jwt";
+import bcrypt from "bcryptjs";
+import * as query from "../db/userQueries.js";
+
 const opts = {
     jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
     secretOrKey: process.env.JWT_SECRET_KEY || "jwt_secret",
@@ -45,4 +45,4 @@ passport.use(
     })
 );
 
-module.exports = passport;
+export default passport;

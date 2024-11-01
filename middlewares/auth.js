@@ -1,12 +1,12 @@
-const passport = require("../config/passport.config");
-const asyncHandler = require("express-async-handler");
-const jwt = require("jsonwebtoken");
+import passport from "../config/passport.config.js";
+import asyncHandler from "express-async-handler";
+import jwt from "jsonwebtoken";
 
-exports.login = asyncHandler(async (req, res, next) => {
+export const login = asyncHandler(async (req, res, next) => {
     passport.authenticate("local", { session: false }, (err, user, info) => {
         if (err || !user) {
             return res.status(400).json({
-                message: info ? "Incorrect username or password" : "Login failed",
+                message: info?.message || "Login failed", // More descriptive error message if available
                 user: req.body,
             });
         }
@@ -14,9 +14,7 @@ exports.login = asyncHandler(async (req, res, next) => {
         const token = jwt.sign(
             { id: user.id, username: user.username, role: user.role },
             process.env.JWT_SECRET_KEY || "jwt_secret",
-            {
-                expiresIn: "2h",
-            }
+            { expiresIn: "2h" }
         );
         return res.status(200).json({ userId: user.id, username: user.username, token });
     })(req, res, next);

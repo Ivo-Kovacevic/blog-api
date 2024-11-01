@@ -1,14 +1,14 @@
-const asyncHandler = require("express-async-handler");
-const passport = require("../config/passport.config");
-const query = require("../db/userQueries");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
-const { roleCheck } = require("../middlewares/roleCheck");
-const { validationResult } = require("express-validator");
-const { validateUser } = require("../validation/user-validation");
+import asyncHandler from "express-async-handler";
+import passport from "../config/passport.config.js";
+import * as query from "../db/userQueries.js";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import { roleCheck } from "../middlewares/roleCheck.js";
+import { validationResult } from "express-validator";
+import { validateUser } from "../validation/user-validation.js";
 
 // ADMIN only
-exports.allUsersGet = [
+export const allUsersGet = [
     passport.authenticate("jwt", { session: false }),
     roleCheck("ADMIN"),
     asyncHandler(async (req, res) => {
@@ -17,7 +17,7 @@ exports.allUsersGet = [
     }),
 ];
 
-exports.userGet = asyncHandler(async (req, res) => {
+export const userGet = asyncHandler(async (req, res) => {
     const userId = parseInt(req.params.userId);
     const user = await query.getUserById(userId);
     if (!user) {
@@ -30,7 +30,7 @@ exports.userGet = asyncHandler(async (req, res) => {
     });
 });
 
-exports.createUserPost = [
+export const createUserPost = [
     validateUser,
     asyncHandler(async (req, res) => {
         const errors = validationResult(req);
@@ -56,7 +56,7 @@ exports.createUserPost = [
     }),
 ];
 
-exports.updateUserPut = [
+export const updateUserPut = [
     passport.authenticate("jwt", { session: false }),
     validateUser,
     asyncHandler(async (req, res) => {
@@ -82,7 +82,7 @@ exports.updateUserPut = [
     }),
 ];
 
-exports.deleteUserDelete = [
+export const deleteUserDelete = [
     passport.authenticate("jwt", { session: false }),
     asyncHandler(async (req, res) => {
         const targetUserId = parseInt(req.params.userId);

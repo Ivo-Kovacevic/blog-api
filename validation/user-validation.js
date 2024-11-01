@@ -1,6 +1,6 @@
-const { check, body } = require("express-validator");
+import { check } from "express-validator";
 
-const validateUser = [
+export const validateUser = [
     check("username")
         .trim()
         .matches(/^[A-Za-z0-9]+$/)
@@ -22,5 +22,3 @@ const validateUser = [
             return true;
         }),
 ];
-
-module.exports = { validateUser };

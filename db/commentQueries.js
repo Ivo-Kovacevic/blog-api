@@ -1,7 +1,7 @@
-const { PrismaClient, Role, Status } = require("@prisma/client");
+import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
-exports.getAllComments = async ({postId, userId}, limit, skip) => {
+export const getAllComments = async ({ postId, userId }, limit, skip) => {
     try {
         const filter = {};
         if (postId) {
@@ -23,7 +23,7 @@ exports.getAllComments = async ({postId, userId}, limit, skip) => {
                 },
             },
             orderBy: {
-                createdAt: 'desc',
+                createdAt: "desc",
             },
             skip: skip,
             take: limit,
@@ -35,7 +35,7 @@ exports.getAllComments = async ({postId, userId}, limit, skip) => {
     }
 };
 
-exports.getCommentById = async (id) => {
+export const getCommentById = async (id) => {
     try {
         return await prisma.comment.findUnique({
             where: {
@@ -48,7 +48,7 @@ exports.getCommentById = async (id) => {
     }
 };
 
-exports.newComment = async (authorId, postId, text) => {
+export const newComment = async (authorId, postId, text) => {
     try {
         return await prisma.comment.create({
             data: {
@@ -68,9 +68,9 @@ exports.newComment = async (authorId, postId, text) => {
                 author: {
                     select: {
                         username: true,
-                    }
-                }
-            }
+                    },
+                },
+            },
         });
     } catch (error) {
         console.error("Error creating new comment: ", error);
@@ -78,9 +78,9 @@ exports.newComment = async (authorId, postId, text) => {
     }
 };
 
-exports.updateComment = async (id, text) => {
+export const updateComment = async (id, text) => {
     try {
-        const commentExists = await exports.getCommentById(id);
+        const commentExists = await getCommentById(id);
         if (!commentExists) {
             return null;
         }
@@ -98,9 +98,9 @@ exports.updateComment = async (id, text) => {
     }
 };
 
-exports.deleteComment = async (id) => {
+export const deleteComment = async (id) => {
     try {
-        const commentExists = await exports.getCommentById(id);
+        const commentExists = await getCommentById(id);
         if (!commentExists) {
             return null;
         }

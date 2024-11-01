@@ -1,12 +1,9 @@
-const asyncHandler = require("express-async-handler");
-const passport = require("../config/passport.config");
-const query = require("../db/commentQueries");
-const { roleCheck } = require("../middlewares/roleCheck");
-const { validationResult } = require("express-validator");
-const { validateUser } = require("../validation/user-validation");
+import asyncHandler from "express-async-handler";
+import passport from "../config/passport.config.js";
+import * as query from "../db/commentQueries.js";
 
 // ADMIN only
-exports.allCommentsGet = asyncHandler(async (req, res) => {
+export const allCommentsGet = asyncHandler(async (req, res) => {
     let postId;
     let userId;
 
@@ -21,7 +18,7 @@ exports.allCommentsGet = asyncHandler(async (req, res) => {
     const limit = parseInt(req.query.limit) || 5; // 5
     const skip = (page - 1) * limit; // 0, 5
 
-    const { comments, totalCount } = await query.getAllComments({postId, userId}, limit, skip);
+    const { comments, totalCount } = await query.getAllComments({ postId, userId }, limit, skip);
     
     if (!comments || comments.length === 0) {
         return res.status(204).json({ message: "No post was found" });
@@ -31,7 +28,7 @@ exports.allCommentsGet = asyncHandler(async (req, res) => {
     return res.status(200).json({ comments, hasMore });
 });
 
-exports.commentGet = asyncHandler(async (req, res) => {
+export const commentGet = asyncHandler(async (req, res) => {
     const commentId = parseInt(req.params.commentId);
     const comment = await query.getCommentById(commentId);
     if (!comment) {
@@ -40,7 +37,7 @@ exports.commentGet = asyncHandler(async (req, res) => {
     return res.status(200).json({ comment });
 });
 
-exports.createCommentPost = [
+export const createCommentPost = [
     passport.authenticate("jwt", { session: false }),
     asyncHandler(async (req, res) => {
         const authorId = req.user.id;
@@ -56,7 +53,7 @@ exports.createCommentPost = [
     }),
 ];
 
-exports.updateCommentPut = [
+export const updateCommentPut = [
     passport.authenticate("jwt", { session: false }),
     asyncHandler(async (req, res) => {
         const commentId = parseInt(req.params.commentId);
@@ -74,7 +71,7 @@ exports.updateCommentPut = [
     }),
 ];
 
-exports.deleteCommentDelete = [
+export const deleteCommentDelete = [
     passport.authenticate("jwt", { session: false }),
     asyncHandler(async (req, res) => {
         const commentId = parseInt(req.params.commentId);
@@ -86,7 +83,7 @@ exports.deleteCommentDelete = [
         if (commentCheck.authorId !== currentUserId) {
             return res.status(403).json({ message: "Forbidden: Can't delete others comments" });
         }
-        const comment = await query.deleteComment(commentId);
+        await query.deleteComment(commentId);
         return res.status(204).send();
     }),
 ];

@@ -1,6 +1,6 @@
-const passport = require("passport");
+import passport from "passport";
 
-exports.attachUserMiddleware = (req, res, next) => {
+export const attachUserMiddleware = (req, res, next) => {
     passport.authenticate("jwt", { session: false }, (err, user) => {
         if (err || !user) {
             return next();
@@ -9,4 +9,3 @@ exports.attachUserMiddleware = (req, res, next) => {
         next();
     })(req, res, next);
 };
-
