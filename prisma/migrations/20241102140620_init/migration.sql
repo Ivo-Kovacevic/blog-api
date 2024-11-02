@@ -19,7 +19,7 @@ CREATE TABLE "Post" (
     "id" SERIAL NOT NULL,
     "authorId" INTEGER NOT NULL,
     "title" TEXT NOT NULL,
-    "content" TEXT NOT NULL,
+    "text" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "status" "Status" NOT NULL DEFAULT 'UNPUBLISHED',
 

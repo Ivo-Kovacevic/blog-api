@@ -28,7 +28,7 @@ model Post {
   authorId  Int
   comments  Comment[]
   title     String
-  content   String
+  text      String
   createdAt DateTime  @default(now())
   status    Status    @default(UNPUBLISHED)
 }

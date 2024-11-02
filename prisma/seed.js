@@ -36,7 +36,7 @@ const main = async () => {
                 return await prisma.post.create({
                     data: {
                         title: faker.lorem.sentence(),
-                        content: faker.lorem.paragraphs(),
+                        text: faker.lorem.paragraphs(),
                         authorId: admin.id,
                         status: Status.PUBLISHED,
                     },
