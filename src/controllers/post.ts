@@ -52,7 +52,7 @@ export const createPostPost = [
 export const updatePostPut = [
     passport.authenticate("jwt", { session: false }),
     roleCheck("ADMIN"),
-    asyncHandler(async (req, res) => {
+    asyncHandler(async (req: Request, res: Response) => {
         const postId = parseInt(req.params.postId);
         const title = req.body.title;
         const content = req.body.content;
@@ -71,7 +71,7 @@ export const updatePostPut = [
 export const deletePostDelete = [
     passport.authenticate("jwt", { session: false }),
     roleCheck("ADMIN"),
-    asyncHandler(async (req, res) => {
+    asyncHandler(async (req: Request, res: Response) => {
         const postId = parseInt(req.params.postId);
         const post = await query.deletePost(postId);
         if (!post) {

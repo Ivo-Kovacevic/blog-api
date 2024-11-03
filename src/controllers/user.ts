@@ -6,18 +6,19 @@ import jwt from "jsonwebtoken";
 import { roleCheck } from "../middlewares/roleCheck.js";
 import { validationResult } from "express-validator";
 import { validateUser } from "../validation/user-validation.js";
+import { Request, Response, NextFunction } from "express";
 
 // ADMIN only
 export const allUsersGet = [
     passport.authenticate("jwt", { session: false }),
     roleCheck("ADMIN"),
-    asyncHandler(async (req, res) => {
+    asyncHandler(async (req: Request, res: Response) => {
         const users = await query.getAllUsers();
         res.status(200).json({ users });
     }),
 ];
 
-export const userGet = asyncHandler(async (req, res) => {
+export const userGet = asyncHandler(async (req: Request, res: Response) => {
     const userId = parseInt(req.params.userId);
     const user = await query.getUserById(userId);
     if (!user) {
@@ -33,7 +34,7 @@ export const userGet = asyncHandler(async (req, res) => {
 
 export const createUserPost = [
     validateUser,
-    asyncHandler(async (req, res) => {
+    asyncHandler(async (req: Request, res: Response) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
             res.status(400).json({ errors: errors.array() });
@@ -62,7 +63,7 @@ export const createUserPost = [
 export const updateUserPut = [
     passport.authenticate("jwt", { session: false }),
     validateUser,
-    asyncHandler(async (req, res) => {
+    asyncHandler(async (req: Request, res: Response) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
             res.status(400).json({ errors: errors.array() });
@@ -90,7 +91,7 @@ export const updateUserPut = [
 
 export const deleteUserDelete = [
     passport.authenticate("jwt", { session: false }),
-    asyncHandler(async (req, res) => {
+    asyncHandler(async (req: Request, res: Response) => {
         const targetUserId = parseInt(req.params.userId);
         const currentUserId = req.user.id;
         if (targetUserId !== currentUserId && req.user.role !== "ADMIN") {
