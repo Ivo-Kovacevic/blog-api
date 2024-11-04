@@ -3,8 +3,9 @@ import passport from "../config/passport.config.js";
 import * as query from "../db/postQueries.js";
 import { roleCheck } from "../middlewares/roleCheck.js";
 import { Request, Response, NextFunction } from "express";
+import { PostParams, PostDTO } from "../@types/post.js";
 
-export const allPostsGet = asyncHandler(async (req, res) => {
+export const allPostsGet = asyncHandler(async (req: Request<{}, {}, {}, {}>, res: Response) => {
     let onlyPublished = true;
 
     // Get all posts if user is ADMIN
@@ -19,7 +20,7 @@ export const allPostsGet = asyncHandler(async (req, res) => {
     res.status(200).json({ posts });
 });
 
-export const postGet = asyncHandler(async (req, res) => {
+export const postGet = asyncHandler(async (req: Request<PostParams, {}, {}, {}>, res: Response) => {
     const postId = parseInt(req.params.postId);
     const post = await query.getPostById(postId);
     if (!post) {
@@ -33,10 +34,12 @@ export const postGet = asyncHandler(async (req, res) => {
 export const createPostPost = [
     passport.authenticate("jwt", { session: false }),
     roleCheck("ADMIN"),
-    asyncHandler(async (req: Request, res: Response) => {
+    asyncHandler(async (req: Request<{}, {}, PostDTO, {}>, res: Response) => {
+        if (!req.user) return;
+
         const authorId = req.user.id;
         const title = req.body.title;
-        const content = req.body.content;
+        const content = req.body.text;
         const validStatuses = ["PUBLISHED", "UNPUBLISHED"];
         const status = validStatuses.includes(req.body.status) ? req.body.status : "UNPUBLISHED";
         const newPost = await query.newPost(authorId, title, content, status);
@@ -52,10 +55,10 @@ export const createPostPost = [
 export const updatePostPut = [
     passport.authenticate("jwt", { session: false }),
     roleCheck("ADMIN"),
-    asyncHandler(async (req: Request, res: Response) => {
+    asyncHandler(async (req: Request<PostParams, {}, PostDTO, {}>, res: Response) => {
         const postId = parseInt(req.params.postId);
         const title = req.body.title;
-        const content = req.body.content;
+        const content = req.body.text;
         const validStatuses = ["PUBLISHED", "UNPUBLISHED"];
         const status = validStatuses.includes(req.body.status) ? req.body.status : "UNPUBLISHED";
         const post = await query.updatePost(postId, title, content, status);
@@ -71,7 +74,7 @@ export const updatePostPut = [
 export const deletePostDelete = [
     passport.authenticate("jwt", { session: false }),
     roleCheck("ADMIN"),
-    asyncHandler(async (req: Request, res: Response) => {
+    asyncHandler(async (req: Request<PostParams, {}, {}, {}>, res: Response) => {
         const postId = parseInt(req.params.postId);
         const post = await query.deletePost(postId);
         if (!post) {

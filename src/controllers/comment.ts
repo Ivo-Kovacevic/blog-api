@@ -2,25 +2,10 @@ import asyncHandler from "express-async-handler";
 import passport from "../config/passport.config.js";
 import * as query from "../db/commentQueries.js";
 import { Request, Response, NextFunction } from "express";
-import { ParamsDictionary } from "express-serve-static-core";
-import { ParsedQs } from "qs";
-
-interface CommentRequestParams {
-    postId?: string;
-    userId?: string;
-    commentId?: string;
-}
-
-interface CommentRequestQuery extends ParsedQs {
-    page?: string;
-    limit?: string;
-}
+import { CommentDTO, CommentParams, CommentQuery } from "../@types/comment.js";
 
 export const allCommentsGet = asyncHandler(
-    async (
-        req: Request<CommentRequestParams, any, any, CommentRequestQuery>,
-        res: Response
-    ) => {
+    async (req: Request<CommentParams, {}, {}, CommentQuery>, res: Response) => {
         if (!req.query.page || !req.query.limit) {
             return;
         }
@@ -66,7 +51,9 @@ export const commentGet = asyncHandler(async (req: Request, res: Response) => {
 
 export const createCommentPost = [
     passport.authenticate("jwt", { session: false }),
-    asyncHandler(async (req: Request, res: Response) => {
+    asyncHandler(async (req: Request<any, any, CommentDTO, any>, res: Response) => {
+        if (!req.user) return;
+
         const authorId = req.user.id;
         const postId = parseInt(req.params.postId);
         const text = req.body.text;
@@ -82,7 +69,9 @@ export const createCommentPost = [
 
 export const updateCommentPut = [
     passport.authenticate("jwt", { session: false }),
-    asyncHandler(async (req: Request, res: Response) => {
+    asyncHandler(async (req: Request<any, any, CommentDTO, any>, res: Response) => {
+        if (!req.user) return;
+
         const commentId = parseInt(req.params.commentId);
         const commentCheck = await query.getCommentById(commentId);
         if (!commentCheck) {
@@ -103,6 +92,8 @@ export const updateCommentPut = [
 export const deleteCommentDelete = [
     passport.authenticate("jwt", { session: false }),
     asyncHandler(async (req: Request, res: Response) => {
+        if (!req.user) return;
+
         const commentId = parseInt(req.params.commentId);
         const commentCheck = await query.getCommentById(commentId);
         if (!commentCheck) {
