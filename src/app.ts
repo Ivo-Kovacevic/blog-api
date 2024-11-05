@@ -1,5 +1,5 @@
 import dotenv from "dotenv/config";
-import express from "express";
+import express, { NextFunction, Request, Response } from "express";
 import cors from "cors";
 import routes from "./routes/index.js";
 import { login } from "./middlewares/auth.js";
@@ -20,10 +20,15 @@ app.use("/posts", routes.post);
 app.use("/posts/:postId/comments", routes.comment);
 app.use("/users/:userId/comments", routes.comment);
 
-app.use("*", (req, res) => {
+app.use((req: Request, res: Response) => {
     res.status(404).json({ message: "Error: Invalid endpoint" });
 });
 
 app.listen(PORT, "0.0.0.0", () => {
     console.log(`App is live at port ${PORT}`);
+});
+
+app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+    console.error(err.stack);
+    res.status(500).json({ message: err.message });
 });

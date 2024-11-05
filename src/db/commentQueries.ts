@@ -30,7 +30,7 @@ export const getAllComments = async (
                 createdAt: "desc",
             },
             skip: skip,
-            take: limit,
+            take: limit === -1 ? undefined : limit, // Take all comments if limit is -1/is not provided
         });
         return { comments, totalCount };
     } catch (error) {

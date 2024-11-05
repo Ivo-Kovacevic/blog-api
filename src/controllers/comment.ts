@@ -1,57 +1,55 @@
-import asyncHandler from "express-async-handler";
 import passport from "../config/passport.config.js";
 import * as query from "../db/commentQueries.js";
 import { Request, Response, NextFunction } from "express";
 import { CommentDTO, CommentParams, CommentQuery } from "../@types/comment.js";
 
-export const allCommentsGet = asyncHandler(
-    async (req: Request<CommentParams, {}, {}, CommentQuery>, res: Response) => {
-        if (!req.query.page || !req.query.limit) {
-            return;
-        }
-        let postId: number | undefined;
-        let userId: number | undefined;
-
-        if (req.params.postId) {
-            postId = parseInt(req.params.postId);
-        }
-        if (req.params.userId) {
-            userId = parseInt(req.params.userId);
-        }
-
-        const page = parseInt(req.query.page) || 1; // 1, 2
-        const limit = parseInt(req.query.limit) || 5; // 5
-        const skip = (page - 1) * limit; // 0, 5
-
-        const { comments, totalCount } = await query.getAllComments(
-            { postId, userId },
-            limit,
-            skip
-        );
-
-        if (!comments || comments.length === 0) {
-            res.status(204).json({ message: "No post was found" });
-            return;
-        }
-        const hasMore = skip + comments.length < totalCount;
-
-        res.status(200).json({ comments, hasMore });
+export const allCommentsGet = async (
+    req: Request<CommentParams, {}, {}, CommentQuery>,
+    res: Response
+) => {
+    let postId: number | undefined;
+    let userId: number | undefined;
+    if (req.params.postId) {
+        postId = parseInt(req.params.postId);
     }
-);
+    if (req.params.userId) {
+        userId = parseInt(req.params.userId);
+    }
 
-export const commentGet = asyncHandler(async (req: Request, res: Response) => {
+    let page: number;
+    let limit: number;
+    if (!req.query.page || !req.query.limit) {
+        // Get all comments if page and limit are not provided
+        page = 1;
+        limit = -1;
+    } else {
+        page = parseInt(req.query.page);
+        limit = parseInt(req.query.limit);
+    }
+    const skip = (page - 1) * limit;
+
+    const { comments, totalCount } = await query.getAllComments({ postId, userId }, limit, skip);
+
+    if (!comments || comments.length === 0) {
+        return res.status(204).json({ message: "No post was found" });
+    }
+    const hasMore = skip + comments.length < totalCount;
+
+    return res.status(200).json({ comments, hasMore });
+};
+
+export const commentGet = async (req: Request, res: Response) => {
     const commentId = parseInt(req.params.commentId);
     const comment = await query.getCommentById(commentId);
     if (!comment) {
-        res.status(404).json({ message: "Error: Comment not found" });
-        return;
+        return res.status(404).json({ message: "Error: Comment not found" });
     }
-    res.status(200).json({ comment });
-});
+    return res.status(200).json({ comment });
+};
 
 export const createCommentPost = [
     passport.authenticate("jwt", { session: false }),
-    asyncHandler(async (req: Request<any, any, CommentDTO, any>, res: Response) => {
+    async (req: Request<any, any, CommentDTO, any>, res: Response) => {
         if (!req.user) return;
 
         const authorId = req.user.id;
@@ -60,52 +58,47 @@ export const createCommentPost = [
 
         const newComment = await query.newComment(authorId, postId, text);
         if (!newComment) {
-            res.status(404).json({ message: "Error: Couldn't create message" });
-            return;
+            return res.status(404).json({ message: "Error: Couldn't create message" });
         }
-        res.status(201).json({ comment: newComment });
-    }),
+        return res.status(201).json({ comment: newComment });
+    },
 ];
 
 export const updateCommentPut = [
     passport.authenticate("jwt", { session: false }),
-    asyncHandler(async (req: Request<any, any, CommentDTO, any>, res: Response) => {
+    async (req: Request<any, any, CommentDTO, any>, res: Response) => {
         if (!req.user) return;
 
         const commentId = parseInt(req.params.commentId);
         const commentCheck = await query.getCommentById(commentId);
         if (!commentCheck) {
-            res.status(404).json({ message: "Error: Comment not found" });
-            return;
+            return res.status(404).json({ message: "Error: Comment not found" });
         }
         const currentUserId = req.user.id;
         if (commentCheck.authorId !== currentUserId) {
-            res.status(403).json({ message: "Forbidden: Can't edit others comments" });
-            return;
+            return res.status(403).json({ message: "Forbidden: Can't edit others comments" });
         }
         const text = req.body.text;
         const comment = await query.updateComment(commentId, text);
-        res.status(200).json({ comment });
-    }),
+        return res.status(200).json({ comment });
+    },
 ];
 
 export const deleteCommentDelete = [
     passport.authenticate("jwt", { session: false }),
-    asyncHandler(async (req: Request, res: Response) => {
+    async (req: Request, res: Response) => {
         if (!req.user) return;
 
         const commentId = parseInt(req.params.commentId);
         const commentCheck = await query.getCommentById(commentId);
         if (!commentCheck) {
-            res.status(404).json({ message: "Error: Comment not found" });
-            return;
+            return res.status(404).json({ message: "Error: Comment not found" });
         }
         const currentUserId = req.user.id;
         if (commentCheck.authorId !== currentUserId) {
-            res.status(403).json({ message: "Forbidden: Can't delete others comments" });
-            return;
+            return res.status(403).json({ message: "Forbidden: Can't delete others comments" });
         }
         await query.deleteComment(commentId);
-        res.status(204).send();
-    }),
+        return res.status(204).send();
+    },
 ];

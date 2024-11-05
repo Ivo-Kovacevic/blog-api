@@ -1,9 +1,9 @@
 import { User } from "@prisma/client";
 import passport from "../config/passport.config.js";
-import asyncHandler from "express-async-handler";
 import jwt from "jsonwebtoken";
+import { NextFunction, Request, Response } from "express";
 
-export const login = asyncHandler(async (req, res, next) => {
+export const login = async (req: Request, res: Response, next: NextFunction) => {
     passport.authenticate(
         "local",
         { session: false },
@@ -23,4 +23,4 @@ export const login = asyncHandler(async (req, res, next) => {
             return res.status(200).json({ userId: user.id, username: user.username, token });
         }
     )(req, res, next);
-});
+};

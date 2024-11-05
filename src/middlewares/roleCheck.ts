@@ -6,8 +6,6 @@ export const roleCheck = (requiredRole: Role) => {
         if (req.user && req.user.role === requiredRole) {
             return next();
         }
-        return res
-            .status(403)
-            .json({ message: "Forbidden: You do not have access to this resource" });
+        res.status(403).json({ message: "Forbidden: You do not have access to this resource" });
     };
 };

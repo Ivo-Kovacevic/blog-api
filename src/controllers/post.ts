@@ -1,11 +1,10 @@
-import asyncHandler from "express-async-handler";
 import passport from "../config/passport.config.js";
 import * as query from "../db/postQueries.js";
 import { roleCheck } from "../middlewares/roleCheck.js";
 import { Request, Response, NextFunction } from "express";
 import { PostParams, PostDTO } from "../@types/post.js";
 
-export const allPostsGet = asyncHandler(async (req: Request<{}, {}, {}, {}>, res: Response) => {
+export const allPostsGet = async (req: Request<{}, {}, {}, {}>, res: Response) => {
     let onlyPublished = true;
 
     // Get all posts if user is ADMIN
@@ -14,27 +13,25 @@ export const allPostsGet = asyncHandler(async (req: Request<{}, {}, {}, {}>, res
     }
     const posts = await query.getAllPosts(onlyPublished);
     if (!posts || posts.length === 0) {
-        res.status(204).json({ message: "No post was found" });
-        return;
+        return res.status(204).json({ message: "No post was found" });
     }
-    res.status(200).json({ posts });
-});
+    return res.status(200).json({ posts });
+};
 
-export const postGet = asyncHandler(async (req: Request<PostParams, {}, {}, {}>, res: Response) => {
+export const postGet = async (req: Request<PostParams, {}, {}, {}>, res: Response) => {
     const postId = parseInt(req.params.postId);
     const post = await query.getPostById(postId);
     if (!post) {
-        res.status(404).json({ message: "Error: Post not found" });
-        return;
+        return res.status(404).json({ message: "Error: Post not found" });
     }
-    res.status(200).json({ post });
-});
+    return res.status(200).json({ post });
+};
 
 // ADMIN only
 export const createPostPost = [
     passport.authenticate("jwt", { session: false }),
     roleCheck("ADMIN"),
-    asyncHandler(async (req: Request<{}, {}, PostDTO, {}>, res: Response) => {
+    async (req: Request<{}, {}, PostDTO, {}>, res: Response) => {
         if (!req.user) return;
 
         const authorId = req.user.id;
@@ -44,18 +41,17 @@ export const createPostPost = [
         const status = validStatuses.includes(req.body.status) ? req.body.status : "UNPUBLISHED";
         const newPost = await query.newPost(authorId, title, content, status);
         if (!newPost) {
-            res.status(404).json({ message: "Error: Couldn't create post" });
-            return;
+            return res.status(404).json({ message: "Error: Couldn't create post" });
         }
-        res.status(201).json({ post: newPost });
-    }),
+        return res.status(201).json({ post: newPost });
+    },
 ];
 
 // ADMIN only
 export const updatePostPut = [
     passport.authenticate("jwt", { session: false }),
     roleCheck("ADMIN"),
-    asyncHandler(async (req: Request<PostParams, {}, PostDTO, {}>, res: Response) => {
+    async (req: Request<PostParams, {}, PostDTO, {}>, res: Response) => {
         const postId = parseInt(req.params.postId);
         const title = req.body.title;
         const content = req.body.text;
@@ -63,24 +59,22 @@ export const updatePostPut = [
         const status = validStatuses.includes(req.body.status) ? req.body.status : "UNPUBLISHED";
         const post = await query.updatePost(postId, title, content, status);
         if (!post) {
-            res.status(404).json({ message: "Error: Post not found" });
-            return;
+            return res.status(404).json({ message: "Error: Post not found" });
         }
-        res.status(200).json({ post });
-    }),
+        return res.status(200).json({ post });
+    },
 ];
 
 // ADMIN only
 export const deletePostDelete = [
     passport.authenticate("jwt", { session: false }),
     roleCheck("ADMIN"),
-    asyncHandler(async (req: Request<PostParams, {}, {}, {}>, res: Response) => {
+    async (req: Request<PostParams, {}, {}, {}>, res: Response) => {
         const postId = parseInt(req.params.postId);
         const post = await query.deletePost(postId);
         if (!post) {
-            res.status(404).json({ message: "Error: Post not found" });
-            return;
+            return res.status(404).json({ message: "Error: Post not found" });
         }
-        res.status(204).send();
-    }),
+        return res.status(204).send();
+    },
 ];

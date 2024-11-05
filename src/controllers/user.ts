@@ -1,4 +1,3 @@
-import asyncHandler from "express-async-handler";
 import passport from "../config/passport.config.js";
 import * as query from "../db/userQueries.js";
 import bcrypt from "bcryptjs";
@@ -13,40 +12,37 @@ import { UserParams, UserDTO } from "../@types/user.js";
 export const allUsersGet = [
     passport.authenticate("jwt", { session: false }),
     roleCheck("ADMIN"),
-    asyncHandler(async (req: Request<{}, {}, {}, {}>, res: Response) => {
+    async (req: Request<{}, {}, {}, {}>, res: Response) => {
         const users = await query.getAllUsers();
-        res.status(200).json({ users });
-    }),
+        return res.status(200).json({ users });
+    },
 ];
 
-export const userGet = asyncHandler(async (req: Request<UserParams, {}, {}, {}>, res: Response) => {
+export const userGet = async (req: Request<UserParams, {}, {}, {}>, res: Response) => {
     const userId = parseInt(req.params.userId);
     const user = await query.getUserById(userId);
     if (!user) {
-        res.status(404).json({ message: "Error: User not found" });
-        return;
+        return res.status(404).json({ message: "Error: User not found" });
     }
-    res.status(200).json({
+    return res.status(200).json({
         username: user.username,
         posts: user.posts,
         comments: user.comments,
     });
-});
+};
 
 export const createUserPost = [
     validateUser,
-    asyncHandler(async (req: Request<{}, {}, UserDTO, {}>, res: Response) => {
+    async (req: Request<{}, {}, UserDTO, {}>, res: Response) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            res.status(400).json({ errors: errors.array() });
-            return;
+            return res.status(400).json({ errors: errors.array() });
         }
 
         const hashedPassword = await bcrypt.hash(req.body.password, 10);
         const newUser = await query.registerUser(req.body.username, hashedPassword);
         if (newUser === "Username is taken") {
-            res.status(400).json({ message: "Username is taken" });
-            return;
+            return res.status(400).json({ message: "Username is taken" });
         }
 
         // Generate JWT if user registers
@@ -57,57 +53,53 @@ export const createUserPost = [
                 expiresIn: "2h",
             }
         );
-        res.status(201).json({ userId: newUser.id, username: newUser.username, token });
-    }),
+        return res.status(201).json({ userId: newUser.id, username: newUser.username, token });
+    },
 ];
 
 export const updateUserPut = [
     passport.authenticate("jwt", { session: false }),
     validateUser,
-    asyncHandler(async (req: Request<UserParams, {}, UserDTO, {}>, res: Response) => {
-        if (!req.user) return
+    async (req: Request<UserParams, {}, UserDTO, {}>, res: Response) => {
+        if (!req.user) return;
 
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            res.status(400).json({ errors: errors.array() });
-            return;
+            return res.status(400).json({ errors: errors.array() });
         }
 
         const targetUserId = parseInt(req.params.userId);
         const currentUserId = req.user.id;
         if (targetUserId !== currentUserId) {
-            res.status(403).json({ message: "Forbidden: Can't edit other users" });
-            return;
+            return res.status(403).json({ message: "Forbidden: Can't edit other users" });
         }
         const newUsername = req.body.username;
         const newPassword = req.body.password;
         const user = await query.updateUser(targetUserId, newUsername, newPassword);
         if (!user) {
-            res.status(400).json({
+            return res.status(400).json({
                 message: "Error: User not found or username is already taken",
             });
-            return;
         }
-        res.status(200).json({ message: `Updated user ${user.username}` });
-    }),
+        return res.status(200).json({ message: `Updated user ${user.username}` });
+    },
 ];
 
 export const deleteUserDelete = [
     passport.authenticate("jwt", { session: false }),
-    asyncHandler(async (req: Request<UserParams, {}, {}, {}>, res: Response) => {
+    async (req: Request<UserParams, {}, {}, {}>, res: Response) => {
         if (!req.user) return;
 
         const targetUserId = parseInt(req.params.userId);
         const currentUserId = req.user.id;
         if (targetUserId !== currentUserId && req.user.role !== "ADMIN") {
-            res.status(403).json({ message: "Forbidden: Can't delete other users" });
-            return;
+            return res.status(403).json({ message: "Forbidden: Can't delete other users" });
         }
         const user = await query.deleteUser(targetUserId);
         if (!user) {
-            res.status(404).json({ message: "Error: User not found" });
-            return;
+            return res.status(404).json({ message: "Error: User not found" });
+            
         }
-        res.status(204).send();
-    }),
+        return res.status(204).send();
+    },
 ];
