@@ -5,7 +5,7 @@ import jwt from "jsonwebtoken";
 import { roleCheck } from "../middlewares/roleCheck.js";
 import { validationResult } from "express-validator";
 import { validateUser } from "../validation/user-validation.js";
-import { Request, Response, NextFunction } from "express";
+import { Request, Response, NextFunction, RequestHandler } from "express";
 import { UserParams, UserDTO } from "../@types/user.js";
 
 // ADMIN only
@@ -18,13 +18,14 @@ export const allUsersGet = [
     },
 ];
 
-export const userGet = async (req: Request<UserParams, {}, {}, {}>, res: Response) => {
+export const userGet: RequestHandler<UserParams, {}, {}, {}> = async (req, res) => {
     const userId = parseInt(req.params.userId);
     const user = await query.getUserById(userId);
     if (!user) {
-        return res.status(404).json({ message: "Error: User not found" });
+        res.status(404).json({ message: "Error: User not found" });
+        return;
     }
-    return res.status(200).json({
+    res.status(200).json({
         username: user.username,
         posts: user.posts,
         comments: user.comments,
@@ -36,13 +37,15 @@ export const createUserPost = [
     async (req: Request<{}, {}, UserDTO, {}>, res: Response) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            return res.status(400).json({ errors: errors.array() });
+            res.status(400).json({ errors: errors.array() });
+            return;
         }
 
         const hashedPassword = await bcrypt.hash(req.body.password, 10);
         const newUser = await query.registerUser(req.body.username, hashedPassword);
         if (newUser === "Username is taken") {
-            return res.status(400).json({ message: "Username is taken" });
+            res.status(400).json({ message: "Username is taken" });
+            return;
         }
 
         // Generate JWT if user registers
@@ -53,7 +56,7 @@ export const createUserPost = [
                 expiresIn: "2h",
             }
         );
-        return res.status(201).json({ userId: newUser.id, username: newUser.username, token });
+        res.status(201).json({ userId: newUser.id, username: newUser.username, token });
     },
 ];
 
@@ -98,7 +101,6 @@ export const deleteUserDelete = [
         const user = await query.deleteUser(targetUserId);
         if (!user) {
             return res.status(404).json({ message: "Error: User not found" });
-            
         }
         return res.status(204).send();
     },

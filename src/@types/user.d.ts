@@ -1,6 +1,7 @@
 import { Status } from "@prisma/client";
+import { ParamsDictionary } from 'express-serve-static-core';
 
-export interface UserParams {
+export interface UserParams extends ParamsDictionary {
     userId: string;
 }
 

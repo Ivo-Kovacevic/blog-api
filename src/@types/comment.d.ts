@@ -1,9 +1,13 @@
 import { ParsedQs } from "qs";
 
-export interface CommentParams {
+export interface ResourceParams {
     postId?: string;
     userId?: string;
-    commentId?: string;
+}
+
+export interface CommentParams {
+    postId: string;
+    commentId: string;
 }
 
 export interface CommentQuery extends ParsedQs {

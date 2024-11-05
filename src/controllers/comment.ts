@@ -1,18 +1,21 @@
 import passport from "../config/passport.config.js";
 import * as query from "../db/commentQueries.js";
-import { Request, Response, NextFunction } from "express";
-import { CommentDTO, CommentParams, CommentQuery } from "../@types/comment.js";
+import { Request, Response, NextFunction, RequestHandler } from "express";
+import { CommentDTO, CommentParams, ResourceParams, CommentQuery } from "../@types/comment.js";
 
-export const allCommentsGet = async (
-    req: Request<CommentParams, {}, {}, CommentQuery>,
-    res: Response
+export const allCommentsGet: RequestHandler<ResourceParams, {}, {}, CommentQuery> = async (
+    req,
+    res
 ) => {
     let postId: number | undefined;
     let userId: number | undefined;
+    // Get postId if accessing comments over post or userId if accessing over user
     if (req.params.postId) {
+        // example: get all comments for specific post ".../posts/3/comments"
         postId = parseInt(req.params.postId);
     }
     if (req.params.userId) {
+        // example: get all comments for specific user ".../users/3/comments"
         userId = parseInt(req.params.userId);
     }
 
@@ -31,25 +34,27 @@ export const allCommentsGet = async (
     const { comments, totalCount } = await query.getAllComments({ postId, userId }, limit, skip);
 
     if (!comments || comments.length === 0) {
-        return res.status(204).json({ message: "No post was found" });
+        res.status(204).json({ message: "No post was found" });
+        return;
     }
     const hasMore = skip + comments.length < totalCount;
 
-    return res.status(200).json({ comments, hasMore });
+    res.status(200).json({ comments, hasMore });
 };
 
-export const commentGet = async (req: Request, res: Response) => {
+export const commentGet: RequestHandler<CommentParams, {}, {}, {}> = async (req, res) => {
     const commentId = parseInt(req.params.commentId);
     const comment = await query.getCommentById(commentId);
     if (!comment) {
-        return res.status(404).json({ message: "Error: Comment not found" });
+        res.status(404).json({ message: "Error: Comment not found" });
+        return;
     }
-    return res.status(200).json({ comment });
+    res.status(200).json({ comment });
 };
 
 export const createCommentPost = [
     passport.authenticate("jwt", { session: false }),
-    async (req: Request<any, any, CommentDTO, any>, res: Response) => {
+    async (req: Request<CommentParams, {}, CommentDTO, {}>, res: Response) => {
         if (!req.user) return;
 
         const authorId = req.user.id;
@@ -66,7 +71,7 @@ export const createCommentPost = [
 
 export const updateCommentPut = [
     passport.authenticate("jwt", { session: false }),
-    async (req: Request<any, any, CommentDTO, any>, res: Response) => {
+    async (req: Request<CommentParams, {}, CommentDTO, {}>, res: Response) => {
         if (!req.user) return;
 
         const commentId = parseInt(req.params.commentId);
@@ -86,7 +91,7 @@ export const updateCommentPut = [
 
 export const deleteCommentDelete = [
     passport.authenticate("jwt", { session: false }),
-    async (req: Request, res: Response) => {
+    async (req: Request<CommentParams, {}, {}, {}>, res: Response) => {
         if (!req.user) return;
 
         const commentId = parseInt(req.params.commentId);

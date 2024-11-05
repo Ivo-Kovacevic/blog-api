@@ -1,10 +1,10 @@
 import passport from "../config/passport.config.js";
 import * as query from "../db/postQueries.js";
 import { roleCheck } from "../middlewares/roleCheck.js";
-import { Request, Response, NextFunction } from "express";
+import { Request, Response, NextFunction, RequestHandler } from "express";
 import { PostParams, PostDTO } from "../@types/post.js";
 
-export const allPostsGet = async (req: Request<{}, {}, {}, {}>, res: Response) => {
+export const allPostsGet: RequestHandler<{}, {}, {}, {}> = async (req, res) => {
     let onlyPublished = true;
 
     // Get all posts if user is ADMIN
@@ -13,18 +13,20 @@ export const allPostsGet = async (req: Request<{}, {}, {}, {}>, res: Response) =
     }
     const posts = await query.getAllPosts(onlyPublished);
     if (!posts || posts.length === 0) {
-        return res.status(204).json({ message: "No post was found" });
+        res.status(204).json({ message: "No post was found" });
+        return;
     }
-    return res.status(200).json({ posts });
+    res.status(200).json({ posts });
 };
 
-export const postGet = async (req: Request<PostParams, {}, {}, {}>, res: Response) => {
+export const postGet: RequestHandler<PostParams, {}, {}, {}> = async (req, res) => {
     const postId = parseInt(req.params.postId);
     const post = await query.getPostById(postId);
     if (!post) {
-        return res.status(404).json({ message: "Error: Post not found" });
+        res.status(404).json({ message: "Error: Post not found" });
+        return;
     }
-    return res.status(200).json({ post });
+    res.status(200).json({ post });
 };
 
 // ADMIN only
