@@ -12,7 +12,12 @@ export const getAllPosts = async (onlyPublished: boolean) => {
                         username: true,
                     },
                 },
-                comments: true,
+                _count: {
+                    select: { comments: true },
+                },
+            },
+            orderBy: {
+                createdAt: "desc",
             },
         });
     } catch (error) {
@@ -31,7 +36,11 @@ export const getPostById = async (id: number) => {
                 author: {
                     select: {
                         username: true,
+                        id: true,
                     },
+                },
+                _count: {
+                    select: { comments: true },
                 },
             },
         });

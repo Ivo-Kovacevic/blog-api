@@ -8,8 +8,9 @@ export const getUserById = async (id: number) => {
                 id: id,
             },
             include: {
-                posts: true,
-                comments: true,
+                _count: {
+                    select: { posts: true, comments: true },
+                },
             },
         });
     } catch (error) {

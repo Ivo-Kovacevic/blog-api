@@ -28,8 +28,9 @@ export const userGet: RequestHandler<Params, {}, {}, {}> = async (req, res) => {
     }
     res.status(200).json({
         username: user.username,
-        posts: user.posts,
-        comments: user.comments,
+        role: user.role,
+        numOfPosts: user._count.posts,
+        numOfComments: user._count.comments,
     });
 };
 
@@ -65,7 +66,6 @@ export const updateUserPut = [
     passport.authenticate("jwt", { session: false }),
     validateUser,
     async (req: RequestWithUser<Params, {}, Body, {}>, res: Response) => {
-
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
             return res.status(400).json({ errors: errors.array() });
@@ -91,7 +91,6 @@ export const updateUserPut = [
 export const deleteUserDelete = [
     passport.authenticate("jwt", { session: false }),
     async (req: RequestWithUser<Params, {}, {}, {}>, res: Response) => {
-
         const targetUserId = parseInt(req.params.userId);
         const currentUserId = req.user.id;
         if (targetUserId !== currentUserId && req.user.role !== "ADMIN") {

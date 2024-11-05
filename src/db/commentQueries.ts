@@ -8,12 +8,8 @@ export const getAllComments = async (
 ) => {
     try {
         const filter: { postId?: number; authorId?: number } = {};
-        if (postId) {
-            filter.postId = postId;
-        }
-        if (userId) {
-            filter.authorId = userId;
-        }
+        postId ? filter.postId = postId : filter.authorId = userId;
+        
         const totalCount = await prisma.comment.count({
             where: filter,
         });
