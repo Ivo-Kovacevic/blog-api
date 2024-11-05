@@ -6,7 +6,8 @@ import { roleCheck } from "../middlewares/roleCheck.js";
 import { validationResult } from "express-validator";
 import { validateUser } from "../validation/user-validation.js";
 import { Request, Response, NextFunction, RequestHandler } from "express";
-import { UserParams, UserDTO } from "../@types/user.js";
+import { Params, Body } from "../@types/user.js";
+import { RequestWithUser } from "../@types/express.js";
 
 // ADMIN only
 export const allUsersGet = [
@@ -18,7 +19,7 @@ export const allUsersGet = [
     },
 ];
 
-export const userGet: RequestHandler<UserParams, {}, {}, {}> = async (req, res) => {
+export const userGet: RequestHandler<Params, {}, {}, {}> = async (req, res) => {
     const userId = parseInt(req.params.userId);
     const user = await query.getUserById(userId);
     if (!user) {
@@ -34,7 +35,7 @@ export const userGet: RequestHandler<UserParams, {}, {}, {}> = async (req, res) 
 
 export const createUserPost = [
     validateUser,
-    async (req: Request<{}, {}, UserDTO, {}>, res: Response) => {
+    async (req: Request<{}, {}, Body, {}>, res: Response) => {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
             res.status(400).json({ errors: errors.array() });
@@ -53,7 +54,7 @@ export const createUserPost = [
             { id: newUser.id, username: newUser.username, role: newUser.role },
             process.env.JWT_SECRET_KEY || "jwt_secret",
             {
-                expiresIn: "2h",
+                expiresIn: "7d",
             }
         );
         res.status(201).json({ userId: newUser.id, username: newUser.username, token });
@@ -63,8 +64,7 @@ export const createUserPost = [
 export const updateUserPut = [
     passport.authenticate("jwt", { session: false }),
     validateUser,
-    async (req: Request<UserParams, {}, UserDTO, {}>, res: Response) => {
-        if (!req.user) return;
+    async (req: RequestWithUser<Params, {}, Body, {}>, res: Response) => {
 
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
@@ -90,8 +90,7 @@ export const updateUserPut = [
 
 export const deleteUserDelete = [
     passport.authenticate("jwt", { session: false }),
-    async (req: Request<UserParams, {}, {}, {}>, res: Response) => {
-        if (!req.user) return;
+    async (req: RequestWithUser<Params, {}, {}, {}>, res: Response) => {
 
         const targetUserId = parseInt(req.params.userId);
         const currentUserId = req.user.id;

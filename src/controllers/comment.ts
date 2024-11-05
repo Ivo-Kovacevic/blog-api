@@ -1,9 +1,10 @@
 import passport from "../config/passport.config.js";
 import * as query from "../db/commentQueries.js";
 import { Request, Response, NextFunction, RequestHandler } from "express";
-import { CommentDTO, CommentParams, ResourceParams, CommentQuery } from "../@types/comment.js";
+import { Body, Params, ResourceParams, Query } from "../@types/comment.js";
+import { RequestWithUser } from "../@types/express.js";
 
-export const allCommentsGet: RequestHandler<ResourceParams, {}, {}, CommentQuery> = async (
+export const allCommentsGet: RequestHandler<ResourceParams, {}, {}, Query> = async (
     req,
     res
 ) => {
@@ -42,7 +43,7 @@ export const allCommentsGet: RequestHandler<ResourceParams, {}, {}, CommentQuery
     res.status(200).json({ comments, hasMore });
 };
 
-export const commentGet: RequestHandler<CommentParams, {}, {}, {}> = async (req, res) => {
+export const commentGet: RequestHandler<Params, {}, {}, {}> = async (req, res) => {
     const commentId = parseInt(req.params.commentId);
     const comment = await query.getCommentById(commentId);
     if (!comment) {
@@ -54,9 +55,8 @@ export const commentGet: RequestHandler<CommentParams, {}, {}, {}> = async (req,
 
 export const createCommentPost = [
     passport.authenticate("jwt", { session: false }),
-    async (req: Request<CommentParams, {}, CommentDTO, {}>, res: Response) => {
-        if (!req.user) return;
-
+    async (req: RequestWithUser<Params, {}, Body, {}>, res: Response) => {
+        
         const authorId = req.user.id;
         const postId = parseInt(req.params.postId);
         const text = req.body.text;
@@ -71,8 +71,7 @@ export const createCommentPost = [
 
 export const updateCommentPut = [
     passport.authenticate("jwt", { session: false }),
-    async (req: Request<CommentParams, {}, CommentDTO, {}>, res: Response) => {
-        if (!req.user) return;
+    async (req: RequestWithUser<Params, {}, Body, {}>, res: Response) => {
 
         const commentId = parseInt(req.params.commentId);
         const commentCheck = await query.getCommentById(commentId);
@@ -91,8 +90,7 @@ export const updateCommentPut = [
 
 export const deleteCommentDelete = [
     passport.authenticate("jwt", { session: false }),
-    async (req: Request<CommentParams, {}, {}, {}>, res: Response) => {
-        if (!req.user) return;
+    async (req: RequestWithUser<Params, {}, {}, {}>, res: Response) => {
 
         const commentId = parseInt(req.params.commentId);
         const commentCheck = await query.getCommentById(commentId);

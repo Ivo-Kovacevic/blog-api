@@ -2,7 +2,8 @@ import passport from "../config/passport.config.js";
 import * as query from "../db/postQueries.js";
 import { roleCheck } from "../middlewares/roleCheck.js";
 import { Request, Response, NextFunction, RequestHandler } from "express";
-import { PostParams, PostDTO } from "../@types/post.js";
+import { Params, Body } from "../@types/post.js";
+import { RequestWithUser } from "../@types/express.js";
 
 export const allPostsGet: RequestHandler<{}, {}, {}, {}> = async (req, res) => {
     let onlyPublished = true;
@@ -19,7 +20,7 @@ export const allPostsGet: RequestHandler<{}, {}, {}, {}> = async (req, res) => {
     res.status(200).json({ posts });
 };
 
-export const postGet: RequestHandler<PostParams, {}, {}, {}> = async (req, res) => {
+export const postGet: RequestHandler<Params, {}, {}, {}> = async (req, res) => {
     const postId = parseInt(req.params.postId);
     const post = await query.getPostById(postId);
     if (!post) {
@@ -33,8 +34,7 @@ export const postGet: RequestHandler<PostParams, {}, {}, {}> = async (req, res) 
 export const createPostPost = [
     passport.authenticate("jwt", { session: false }),
     roleCheck("ADMIN"),
-    async (req: Request<{}, {}, PostDTO, {}>, res: Response) => {
-        if (!req.user) return;
+    async (req: RequestWithUser<{}, {}, Body, {}>, res: Response) => {
 
         const authorId = req.user.id;
         const title = req.body.title;
@@ -53,7 +53,7 @@ export const createPostPost = [
 export const updatePostPut = [
     passport.authenticate("jwt", { session: false }),
     roleCheck("ADMIN"),
-    async (req: Request<PostParams, {}, PostDTO, {}>, res: Response) => {
+    async (req: Request<Params, {}, Body, {}>, res: Response) => {
         const postId = parseInt(req.params.postId);
         const title = req.body.title;
         const content = req.body.text;
@@ -71,7 +71,7 @@ export const updatePostPut = [
 export const deletePostDelete = [
     passport.authenticate("jwt", { session: false }),
     roleCheck("ADMIN"),
-    async (req: Request<PostParams, {}, {}, {}>, res: Response) => {
+    async (req: Request<Params, {}, {}, {}>, res: Response) => {
         const postId = parseInt(req.params.postId);
         const post = await query.deletePost(postId);
         if (!post) {

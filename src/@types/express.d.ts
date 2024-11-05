@@ -6,3 +6,8 @@ declare module "express-serve-static-core" {
         user?: User;
     }
 }
+
+export interface RequestWithUser<Params = {}, ResBody = any, ReqBody = any, Query = {}>
+    extends Request<Params, ResBody, ReqBody, Query> {
+    user: User;
+}

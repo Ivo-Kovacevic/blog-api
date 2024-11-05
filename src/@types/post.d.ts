@@ -1,10 +1,10 @@
 import { Status } from "@prisma/client";
 
-export interface PostParams {
+export interface Params {
     postId: string;
 }
 
-export interface PostDTO {
+export interface Body {
     title: string;
     text: string;
     status: Status;

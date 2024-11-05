@@ -1,20 +1,18 @@
-import { ParsedQs } from "qs";
-
 export interface ResourceParams {
     postId?: string;
     userId?: string;
 }
 
-export interface CommentParams {
+export interface Params {
     postId: string;
     commentId: string;
 }
 
-export interface CommentQuery extends ParsedQs {
+export interface Query {
     page?: string;
     limit?: string;
 }
 
-export interface CommentDTO {
+export interface Body {
     text: string;
 }
