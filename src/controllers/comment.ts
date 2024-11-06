@@ -1,8 +1,8 @@
 import passport from "../config/passport.config.js";
 import * as query from "../db/commentQueries.js";
 import { Request, Response, NextFunction, RequestHandler } from "express";
-import { Body, Params, ResourceParams, Query } from "../@types/comment.js";
-import { RequestWithUser } from "../@types/express.js";
+import { Body, Params, ResourceParams } from "../@types/comment.js";
+import { Query, RequestWithUser } from "../@types/express.js";
 
 export const allCommentsGet: RequestHandler<ResourceParams, {}, {}, Query> = async (req, res) => {
     let postId: number | undefined;
@@ -14,17 +14,9 @@ export const allCommentsGet: RequestHandler<ResourceParams, {}, {}, Query> = asy
     // example: get all comments for specific user ".../users/3/comments"
     if (req.params.userId) userId = parseInt(req.params.userId);
 
-    let page: number;
-    let limit: number;
-    if (!req.query.page || !req.query.limit) {
-        // Get all comments if page and limit are not provided
-        page = 1;
-        limit = -1;
-    } else {
-        page = parseInt(req.query.page);
-        limit = parseInt(req.query.limit);
-    }
-    const skip = (page - 1) * limit;
+    const page = req.query.page ? parseInt(req.query.page) : 1; // Set page to 1 if not provided
+    const limit = req.query.limit ? parseInt(req.query.limit) : undefined; // Set limit to undefined if not provided to get all posts
+    const skip = limit ? (page - 1) * limit : 0; // Set skip to 0 if not provided
 
     const { comments, totalCount } = await query.getAllComments({ postId, userId }, limit, skip);
 

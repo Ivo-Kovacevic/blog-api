@@ -1,10 +1,13 @@
 import { PrismaClient, Status } from "@prisma/client";
 const prisma = new PrismaClient();
 
-export const getAllPosts = async (onlyPublished: boolean) => {
+export const getAllPosts = async (onlyPublished: boolean, limit: number | undefined, skip: number) => {
     try {
         const whereCondition = onlyPublished ? { status: Status.PUBLISHED } : {};
-        return await prisma.post.findMany({
+        const totalCount = await prisma.post.count({
+            where: whereCondition,
+        });
+        const posts = await prisma.post.findMany({
             where: whereCondition,
             include: {
                 author: {
@@ -19,7 +22,10 @@ export const getAllPosts = async (onlyPublished: boolean) => {
             orderBy: {
                 createdAt: "desc",
             },
+            skip: skip,
+            take: limit, // Take all posts if limit is undefined
         });
+        return { posts, totalCount };
     } catch (error) {
         console.error("Error retrieving all posts: ", error);
         throw new Error("Could not retrieve posts.");

@@ -3,7 +3,7 @@ const prisma = new PrismaClient();
 
 export const getAllComments = async (
     { postId, userId }: { postId: number | undefined; userId: number | undefined },
-    limit: number,
+    limit: number | undefined,
     skip: number
 ) => {
     try {
@@ -26,7 +26,7 @@ export const getAllComments = async (
                 createdAt: "desc",
             },
             skip: skip,
-            take: limit === -1 ? undefined : limit, // Take all comments if limit is -1/is not provided
+            take: limit, // Take all comments if limit is undefined
         });
         return { comments, totalCount };
     } catch (error) {

@@ -8,11 +8,6 @@ export interface Params {
     commentId: string;
 }
 
-export interface Query {
-    page?: string;
-    limit?: string;
-}
-
 export interface Body {
     text: string;
 }

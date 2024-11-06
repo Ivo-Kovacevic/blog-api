@@ -3,21 +3,26 @@ import * as query from "../db/postQueries.js";
 import { roleCheck } from "../middlewares/roleCheck.js";
 import { Request, Response, NextFunction, RequestHandler } from "express";
 import { Params, Body } from "../@types/post.js";
-import { RequestWithUser } from "../@types/express.js";
+import { Query, RequestWithUser } from "../@types/express.js";
 
-export const allPostsGet: RequestHandler<{}, {}, {}, {}> = async (req, res) => {
+export const allPostsGet: RequestHandler<{}, {}, {}, Query> = async (req, res) => {
     let onlyPublished = true;
 
     // Get all posts if user is ADMIN
-    if (req.user && req.user.role === "ADMIN") {
-        onlyPublished = false;
-    }
-    const posts = await query.getAllPosts(onlyPublished);
+    if (req.user && req.user.role === "ADMIN") onlyPublished = false;
+
+    const page = req.query.page ? parseInt(req.query.page) : 1; // Set page to 1 if not provided
+    const limit = req.query.limit ? parseInt(req.query.limit) : undefined; // Set limit to undefined if not provided to get all posts
+    const skip = limit ? (page - 1) * limit : 0; // Set skip to 0 if not provided
+
+    const { posts, totalCount } = await query.getAllPosts(onlyPublished, limit, skip);
     if (!posts || posts.length === 0) {
         res.status(204).json({ message: "No post was found" });
         return;
     }
-    res.status(200).json({ posts });
+    const hasMore = skip + posts.length < totalCount;
+
+    res.status(200).json({ posts, hasMore });
 };
 
 export const postGet: RequestHandler<Params, {}, {}, {}> = async (req, res) => {
@@ -35,7 +40,6 @@ export const createPostPost = [
     passport.authenticate("jwt", { session: false }),
     roleCheck("ADMIN"),
     async (req: RequestWithUser<{}, {}, Body, {}>, res: Response) => {
-
         const authorId = req.user.id;
         const title = req.body.title;
         const content = req.body.text;

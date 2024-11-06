@@ -11,3 +11,8 @@ export interface RequestWithUser<Params = {}, ResBody = any, ReqBody = any, Quer
     extends Request<Params, ResBody, ReqBody, Query> {
     user: User;
 }
+
+export interface Query {
+    page?: string;
+    limit?: string;
+}
