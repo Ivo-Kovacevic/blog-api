@@ -18,7 +18,7 @@ const main = async () => {
 
         // Create 4 regular users
         const users = await Promise.all(
-            Array.from({ length: 4 }, async () => {
+            Array.from({ length: 20 }, async () => {
                 const password = await bcrypt.hash(faker.internet.password(), 10);
                 return await prisma.user.create({
                     data: {
@@ -32,11 +32,11 @@ const main = async () => {
 
         // Create 10 posts by admin
         const posts = await Promise.all(
-            Array.from({ length: 10 }, async () => {
+            Array.from({ length: 50 }, async () => {
                 return await prisma.post.create({
                     data: {
                         title: faker.lorem.sentence(),
-                        text: faker.lorem.paragraphs(),
+                        text: faker.lorem.paragraphs({ min: 5, max: 15 }),
                         authorId: admin.id,
                         status: Status.PUBLISHED,
                     },
@@ -46,7 +46,7 @@ const main = async () => {
 
         // Create comments for each post
         for (const post of posts) {
-            const numComments = faker.number.int({ min: 1, max: 5 });
+            const numComments = faker.number.int({ min: 5, max: 20 });
             await Promise.all(
                 Array.from({ length: numComments }, async () => {
                     return await prisma.comment.create({
