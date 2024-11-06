@@ -14,8 +14,8 @@ export const getUserById = async (id: number) => {
             },
         });
     } catch (error) {
-        console.error(error);
-        throw error;
+        console.error("Error retrieving user by ID: ", error);
+        throw new Error("Could not retrieve the user.");
     }
 };
 
@@ -46,7 +46,7 @@ export const registerUser = async (username: string, password: string) => {
         });
     } catch (error) {
         console.error("Error while registering user: ", error);
-        throw error;
+        throw new Error("Could not make new user.");
     }
 };
 
@@ -70,8 +70,8 @@ export const getAllUsers = async () => {
     try {
         return await prisma.user.findMany();
     } catch (error) {
-        console.error(error);
-        throw error;
+        console.error("Error while retrieving all users: ", error);
+        throw new Error("Could not retrieve all users.");
     }
 };
 
@@ -87,8 +87,8 @@ export const deleteUser = async (id: number) => {
             },
         });
     } catch (error) {
-        console.error(error);
-        throw error;
+        console.error("Error while deleting user: ", error);
+        throw new Error("Could not delete user.");
     }
 };
 
@@ -108,7 +108,7 @@ export const updateUser = async (id: number, username: string, password: string)
             },
         });
     } catch (error) {
-        console.error(error);
-        throw error;
+        console.error("Error while updating user: ", error);
+        throw new Error("Could not update user.");
     }
 };
