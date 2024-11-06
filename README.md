@@ -22,7 +22,7 @@ This API provides endpoints for managing users, posts, and comments. Below are t
 
 | Method | Endpoint      | Description                | Expected Input | Authentication |
 |--------|---------------|----------------------------|----------------|----------------|
-| GET    | /posts        | Retrieve all posts         | None | None (Admin sees all, others see published) |
+| GET    | /posts        | Retrieve all posts         | optional `page` and `limit` query params | None (Admin sees all, others see published) |
 | GET    | /posts/:postId| Retrieve a specific post   | `postId` in URL | None |
 | POST   | /posts        | Create a new post          | `title`, `text`, `status` in request body | Admin only |
 | PUT    | /posts/:postId| Update a specific post     | `postId` in URL, `title`, `text`, `status` in request body | Admin only |
