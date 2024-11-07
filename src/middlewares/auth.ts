@@ -10,7 +10,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
         (err: Error | null, user: User | false, info: { message?: string } | undefined) => {
             if (err || !user) {
                 return res.status(400).json({
-                    message: info?.message || "Login failed",
+                    message: "Incorrect username or password",
                     user: req.body,
                 });
             }
