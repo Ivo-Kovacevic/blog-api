@@ -91,6 +91,13 @@ export const updateComment = async (id: number, text: string) => {
             data: {
                 text,
             },
+            include: {
+                author: {
+                    select: {
+                        username: true,
+                    },
+                },
+            },
         });
     } catch (error) {
         console.error("Error updating comment: ", error);
